@@ -9,7 +9,7 @@ streamlit run app.py
 ### Project Structure
 
 ```
-hackathon_project/
+net_handle/
 ├── README.md
 ├── requirements.txt       # Dependencies (e.g., Streamlit, LangChain, LlamaIndex, apscheduler, etc.)
 ├── app.py                 # Main Streamlit app entry point
