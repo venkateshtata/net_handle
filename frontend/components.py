@@ -1,13 +1,21 @@
-# frontend/components.py
-
 import streamlit as st
+from backend.agent_manager import AgentManager
+
+agent_manager = AgentManager()
 
 def render_search_bar():
     # Create a search bar input field
     search_query = st.text_input("Search Agents", placeholder="Type here to search...")
-    # Display search results or feedback (optional)
+
     if search_query:
-        st.write(f"Searching for: {search_query}")
+        matching_agents = [name for name in agent_manager.agents.keys() if search_query.lower() in name.lower()]
+        
+        if matching_agents:
+            for agent_name in matching_agents:
+                if st.button(f"Use {agent_name}"):
+                    st.session_state.page = agent_name  # Navigate to the agent's page when selected
+        else:
+            st.write("No matching agents found.")
 
 def render_sidebar():
     # Sidebar title

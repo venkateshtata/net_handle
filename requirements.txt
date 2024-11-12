@@ -1,0 +1,7 @@
+streamlit
+langchain
+llama-index
+apscheduler
+serpapi
+scikit-learn
+openai

@@ -3,6 +3,8 @@ Revolutionizing your digital life by transforming the way you interact with the 
 
 ## Run Project
 ```
+pip install -r requirements.txt
+
 streamlit run app.py
 ```
 
