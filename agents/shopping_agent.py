@@ -17,7 +17,7 @@ class ShoppingHandler:
 
         try:
             search = serpapi.search(params)
-            results = search.as_dict()
+            results = search.as_dict()  # Directly get the results dictionary
             return results.get("organic_results", [])[:10]  # Get the top 10 results
         except Exception as e:
             return [{"title": "Error", "link": str(e)}]
@@ -33,21 +33,28 @@ class ShoppingHandler:
 
         # Calculate similarity scores for each result
         results_with_scores = []
-        for result in results:
+        for index, result in enumerate(results, start=1):
             title = result.get("title", "")
             description = result.get("snippet", "")
+            link = result.get("link", "")
+            image_url = result.get("thumbnail", "")  # Assuming there's a thumbnail field for image URL
             content = f"{title}. {description}"
             result_embedding = self.get_embedding(content)
             similarity_score = cosine_similarity([query_embedding], [result_embedding])[0][0]
 
             results_with_scores.append({
+                "index": index,
                 "title": title,
-                "link": result.get("link", ""),
+                "description": description,
+                "link": link,
+                "image_url": image_url,
                 "score": similarity_score
             })
 
         # Sort results by similarity score in descending order
         sorted_results = sorted(results_with_scores, key=lambda x: x["score"], reverse=True)
         
-        # Return sorted results
+        # Debug: Print and return the sorted results to verify structure
+        print("Debug - Search Results:", sorted_results)
         return sorted_results
+

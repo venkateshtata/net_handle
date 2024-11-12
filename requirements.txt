@@ -5,3 +5,4 @@ apscheduler
 serpapi
 scikit-learn
 openai
+sentence-transformers

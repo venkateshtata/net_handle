@@ -19,9 +19,9 @@ def render_search_bar():
 
 def render_sidebar():
     # Sidebar title
-    st.sidebar.markdown("<h2 style='color: white;'>Menu</h2>", unsafe_allow_html=True)
+    st.sidebar.markdown("<h2 style='color: #E5E5E5;'>Menu</h2>", unsafe_allow_html=True)
 
-    # Sidebar buttons with divider lines and custom CSS for symmetry
+    # Enhanced CSS for sidebar buttons with icons
     st.sidebar.markdown(
         """
         <style>
@@ -30,20 +30,24 @@ def render_sidebar():
             padding: 10px 20px;
             width: 100%;
             background-color: #333333;
-            color: white;
+            color: #FFFFFF;
             font-size: 16px;
             text-align: left;
+            display: flex;
+            align-items: center;
             cursor: pointer;
-            margin: 0;
+            margin-bottom: 5px;
         }
         .sidebar-button:hover {
             background-color: #444444;
         }
+        .sidebar-icon {
+            margin-right: 8px;
+        }
         </style>
-        
-        <button class="sidebar-button">Home</button>
-        <button class="sidebar-button">My Handlers</button>
-        <button class="sidebar-button">Profile Settings</button>
+        <button class="sidebar-button"><span class="sidebar-icon">🏠</span> Home</button>
+        <button class="sidebar-button"><span class="sidebar-icon">🛠️</span> My Handlers</button>
+        <button class="sidebar-button"><span class="sidebar-icon">⚙️</span> Profile Settings</button>
         """,
         unsafe_allow_html=True
     )
