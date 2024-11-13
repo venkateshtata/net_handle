@@ -41,31 +41,41 @@ def render_agent_search_page(agent_name):
     if agent:
         st.subheader(f"{agent_name} Search")
         query = st.text_input(f"Search with {agent_name}", placeholder="Type your query here...")
-        
+
         if query:
             results = agent.search(query)  # Expected to be a list of dictionaries
 
-            # Debug print to verify the structure of results
-            # st.write("Debug - Raw Search Results:", results)
-
+            # Check if results are valid
             if not isinstance(results, list) or not all(isinstance(item, dict) for item in results):
                 st.error("Error: Expected search results as a list of dictionaries.")
                 return
-            
-            st.session_state.agent_responses.setdefault(agent_name, []).append(results)
-            st.write(f"Top results for '{query}' based on similarity:")
+            if not results:
+                st.write("No results found for this query.")
+                return
 
+            # Render results in a grid with thumbnails and product details
             for result in results:
-                title = result.get("title", "No Title")
-                score = result.get("score", 0.0)
-                link = result.get("link", "#")
-                image_url = result.get("image_url", "")
+                if 'error' in result:
+                    st.write(result['error'])
+                else:
+                    col1, col2 = st.columns([1, 4])
+                    with col1:
+                        # Check if image_url is available; if not, display a placeholder or skip image
+                        image_url = result.get("image_url", "")
+                        if image_url:
+                            st.image(image_url, width=100)
+                        else:
+                            st.image("https://via.placeholder.com/100", width=100)  # Placeholder image
 
-                with st.expander(f"{title}"):
-                    st.write(f"**Score:** {score:.2f}")
-                    if image_url:
-                        st.image(image_url, width=100)  # Display the image thumbnail if available
-                    st.markdown(f"[Visit Link]({link})", unsafe_allow_html=True)
+                    with col2:
+                        st.markdown(f"**[{result.get('title', 'Unknown Product')}]({result.get('link', '#')})**")
+                        st.write(result.get("description", "No description available"))
+                        st.write(f"**Score:** {result.get('score', 0)}")
+                    st.markdown("<hr>", unsafe_allow_html=True)
+
+
+
+
 
 
 def render_my_handlers():
