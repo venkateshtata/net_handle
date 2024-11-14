@@ -1,9 +1,9 @@
 # config.py
 import os
-import constants
+import experiments.constants as cons
 
 # Groq API key
-GROQ_API_KEY = os.getenv(constants.GROQ_API_KEY)
+GROQ_API_KEY = os.getenv(cons.GROQ_API_KEY)
 
 # Set SERP API key here or load it from environment variables
-SERP_API_KEY = os.getenv(constants.SERP_API_KEY)
+SERP_API_KEY = os.getenv(cons.SERP_API_KEY)

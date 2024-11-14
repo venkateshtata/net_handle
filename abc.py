@@ -1,7 +1,7 @@
 import os
 import json
 import re
-from agents.groq_llm_wrapper import GroqLLMWrapper
+from experiments.groq_integration.llama_groq_client import GroqLlamaClient  # Import your custom client
 from langchain.agents import initialize_agent, load_tools
 from langchain_community.utilities import SerpAPIWrapper
 from pydantic import BaseModel, ValidationError
@@ -21,8 +21,8 @@ class Product(BaseModel):
 
 class ShoppingHandler:
     def __init__(self):
-        # Use GroqLLMWrapper instead of OpenAI
-        self.llm = GroqLLMWrapper(model_name="llama-3.2-11b-vision-preview")
+        # Use GroqLlamaClient instead of OpenAI
+        self.llm = GroqLlamaClient(model_name="llama-3.2-11b-vision-preview")
 
         self.prompt_template_str = """\
 You are a product expert. Find a few products related to the query below.
@@ -136,3 +136,4 @@ Only include relevant products. Keep responses brief.
 shopping_agent = ShoppingHandler()
 result = shopping_agent.search("apple watch")
 print(result)
+
