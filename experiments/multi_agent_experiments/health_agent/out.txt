@@ -1,0 +1,86 @@
+{'supervisor': {'next': 'HealthcareAgent'}}
+----
+{'HealthcareAgent': {'messages': [HumanMessage(content="Here's an overview of your diet plan and related health information:\n\n### Diet Plan\n**Monday:**\n- **Breakfast:** Oatmeal with bananas\n- **Lunch:** Grilled chicken salad\n- **Dinner:** Grilled salmon with quinoa\n- **Snacks:** Almonds, Apple\n\n**Tuesday:**\n- **Breakfast:** Greek yogurt with berries\n- **Lunch:** Vegetable stir-fry with tofu\n- **Dinner:** Chicken soup with whole-grain bread\n- **Snacks:** Carrot sticks, Dark chocolate\n\n**Wednesday:**\n- **Breakfast:** Scrambled eggs with spinach\n- **Lunch:** Turkey sandwich on whole-grain bread\n- **Dinner:** Pasta with marinara sauce and steamed broccoli\n- **Snacks:** Yogurt, Orange\n\n**Thursday:**\n- **Breakfast:** Smoothie (spinach, banana, almond milk)\n- **Lunch:** Quinoa salad with chickpeas\n- **Dinner:** Grilled steak with mashed sweet potatoes\n- **Snacks:** Mixed nuts, Pear\n\n**Friday:**\n- **Breakfast:** Whole-grain toast with avocado\n- **Lunch:** Grilled fish tacos\n- **Dinner:** Lentil curry with brown rice\n- **Snacks:** Cucumber slices, Berries\n\n**Saturday:**\n- **Breakfast:** Pancakes with maple syrup\n- **Lunch:** Chicken Caesar salad\n- **Dinner:** Beef stew with vegetables\n- **Snacks:** Protein bar, Apple\n\n**Sunday:**\n- **Breakfast:** Scrambled tofu with vegetables\n- **Lunch:** Grilled shrimp and vegetable skewers\n- **Dinner:** Vegetarian chili with cornbread\n- **Snacks:** Popcorn, Grapes\n\n### Supplements\n- **Vitamin D3 1000 IU:** One capsule daily after a meal.\n- **Glucosamine Sulfate 1500 mg:** One tablet daily for joint health.\n\nEncouraged to intake calcium-rich foods.\n\n### Medication Schedule\n- **Morning:**\n  - Amlodipine 5 mg (1 tablet with water)\n  - Losartan 50 mg (1 tablet after breakfast)\n- **After Lunch:**\n  - Vitamin D3 1000 IU (1 capsule with a meal)\n- **Evening:**\n  - Naproxen 250 mg (as needed for knee pain, 1 tablet if significant discomfort)\n  - Glucosamine Sulfate 1500 mg (1 tablet with a glass of water)\n\n### Follow-Up\n- **Patient Name:** John Doe\n- **Date of Birth:** 15th June 1985\n- **Date:** 5th November 2024\n- **Doctor:** Dr. Sarah Thompson\n\nJohn attended a follow-up appointment to review blood pressure and knee pain management. Blood pressure improved to 135/85 mmHg. Reports mild improvement in joint pain but occasional discomfort during physical activity.\n\n**Recommendations:**\n1. Continue current hypertension and joint pain medications.\n2. Physical therapy referral initiated.\n3. Follow up in 3 months for reassessment.\n\nIf you have any questions or need further details, feel free to ask!", additional_kwargs={}, response_metadata={}, name='HealthcareAgent')]}}
+----
+{'supervisor': {'next': 'FINISH'}}
+----
+
+--- Final Summary of Workflow ---
+
+Supervisor decided to assign task to: HealthcareAgent
+HealthcareAgent completed task with response: Here's an overview of your diet plan and related health information:
+
+### Diet Plan
+**Monday:**
+- **Breakfast:** Oatmeal with bananas
+- **Lunch:** Grilled chicken salad
+- **Dinner:** Grilled salmon with quinoa
+- **Snacks:** Almonds, Apple
+
+**Tuesday:**
+- **Breakfast:** Greek yogurt with berries
+- **Lunch:** Vegetable stir-fry with tofu
+- **Dinner:** Chicken soup with whole-grain bread
+- **Snacks:** Carrot sticks, Dark chocolate
+
+**Wednesday:**
+- **Breakfast:** Scrambled eggs with spinach
+- **Lunch:** Turkey sandwich on whole-grain bread
+- **Dinner:** Pasta with marinara sauce and steamed broccoli
+- **Snacks:** Yogurt, Orange
+
+**Thursday:**
+- **Breakfast:** Smoothie (spinach, banana, almond milk)
+- **Lunch:** Quinoa salad with chickpeas
+- **Dinner:** Grilled steak with mashed sweet potatoes
+- **Snacks:** Mixed nuts, Pear
+
+**Friday:**
+- **Breakfast:** Whole-grain toast with avocado
+- **Lunch:** Grilled fish tacos
+- **Dinner:** Lentil curry with brown rice
+- **Snacks:** Cucumber slices, Berries
+
+**Saturday:**
+- **Breakfast:** Pancakes with maple syrup
+- **Lunch:** Chicken Caesar salad
+- **Dinner:** Beef stew with vegetables
+- **Snacks:** Protein bar, Apple
+
+**Sunday:**
+- **Breakfast:** Scrambled tofu with vegetables
+- **Lunch:** Grilled shrimp and vegetable skewers
+- **Dinner:** Vegetarian chili with cornbread
+- **Snacks:** Popcorn, Grapes
+
+### Supplements
+- **Vitamin D3 1000 IU:** One capsule daily after a meal.
+- **Glucosamine Sulfate 1500 mg:** One tablet daily for joint health.
+
+Encouraged to intake calcium-rich foods.
+
+### Medication Schedule
+- **Morning:**
+  - Amlodipine 5 mg (1 tablet with water)
+  - Losartan 50 mg (1 tablet after breakfast)
+- **After Lunch:**
+  - Vitamin D3 1000 IU (1 capsule with a meal)
+- **Evening:**
+  - Naproxen 250 mg (as needed for knee pain, 1 tablet if significant discomfort)
+  - Glucosamine Sulfate 1500 mg (1 tablet with a glass of water)
+
+### Follow-Up
+- **Patient Name:** John Doe
+- **Date of Birth:** 15th June 1985
+- **Date:** 5th November 2024
+- **Doctor:** Dr. Sarah Thompson
+
+John attended a follow-up appointment to review blood pressure and knee pain management. Blood pressure improved to 135/85 mmHg. Reports mild improvement in joint pain but occasional discomfort during physical activity.
+
+**Recommendations:**
+1. Continue current hypertension and joint pain medications.
+2. Physical therapy referral initiated.
+3. Follow up in 3 months for reassessment.
+
+If you have any questions or need further details, feel free to ask!
+Supervisor decided to assign task to: FINISH

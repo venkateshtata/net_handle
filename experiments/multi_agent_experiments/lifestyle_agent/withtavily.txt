@@ -1,0 +1,25 @@
+{'supervisor': {'next': 'LifestyleAgent'}}
+----
+{'LifestyleAgent': {'messages': [HumanMessage(content="Here are some ongoing discounts for Omega-3 supplements and multivitamins in October 2023:\n\n### Omega-3 Supplements:\n1. **Andrew Lessman Monthly Specials**: Special pricing and free shipping on Algal DHA-250 Essential Omega-3. [More details](https://community.hsn.com/forums/health-and-wellness/october-2023-andrew-lessman-monthly-specials/1146732/).\n2. **Dr. Moritz's Vegan Omega-3**: Subscribe & Save 50% on their vegan omega-3 supplement made from algal oil. [More details](https://moritzlab.com/blogs/articles/the-best-vegan-omega-3-supplements-a-comprehensive-guide-on-your-top-plant-based-option).\n3. **Natural Factors Omega-3**: Offers premium Omega-3 supplements rich in EPA and DHA. [More details](https://naturalfactors.com/collections/omegas).\n\n### Multivitamins:\n1. **Reviva Nutrition**: 25% off Liquid Collagen or Slumberz with the purchase of Multivitamin or Calcium. Active from Oct 1, 2023, to Oct 31, 2023. [More details](https://www.revivanutrition.com/pages/october-promotion).\n2. **Sprouts Farmers Market**: 25% off during their Vitamin Extravaganza from October 21st to October 28th on all vitamins and supplements. [More details](https://www.thecentsableshoppin.com/sprouts-25-off-vitamin-extravaganza-save-huge-on-body-care-supplements-and-more/).\n3. **Ritual**: 40% off your order with a coupon code. [More details](https://www.retailmenot.com/view/ritual.com).\n4. **Swanson Vitamins**: 30% off Swanson Supplements plus free shipping on orders over $50. [More details](https://www.retailmenot.com/view/swansonvitamins.com).\n\nThese offers are subject to terms and conditions, so it's advisable to check the specific details on the respective websites.", additional_kwargs={}, response_metadata={}, name='LifestyleAgent')]}}
+----
+{'supervisor': {'next': 'FINISH'}}
+----
+
+--- Final Summary of Workflow ---
+
+Supervisor decided to assign task to: LifestyleAgent
+LifestyleAgent completed task with response: Here are some ongoing discounts for Omega-3 supplements and multivitamins in October 2023:
+
+### Omega-3 Supplements:
+1. **Andrew Lessman Monthly Specials**: Special pricing and free shipping on Algal DHA-250 Essential Omega-3. [More details](https://community.hsn.com/forums/health-and-wellness/october-2023-andrew-lessman-monthly-specials/1146732/).
+2. **Dr. Moritz's Vegan Omega-3**: Subscribe & Save 50% on their vegan omega-3 supplement made from algal oil. [More details](https://moritzlab.com/blogs/articles/the-best-vegan-omega-3-supplements-a-comprehensive-guide-on-your-top-plant-based-option).
+3. **Natural Factors Omega-3**: Offers premium Omega-3 supplements rich in EPA and DHA. [More details](https://naturalfactors.com/collections/omegas).
+
+### Multivitamins:
+1. **Reviva Nutrition**: 25% off Liquid Collagen or Slumberz with the purchase of Multivitamin or Calcium. Active from Oct 1, 2023, to Oct 31, 2023. [More details](https://www.revivanutrition.com/pages/october-promotion).
+2. **Sprouts Farmers Market**: 25% off during their Vitamin Extravaganza from October 21st to October 28th on all vitamins and supplements. [More details](https://www.thecentsableshoppin.com/sprouts-25-off-vitamin-extravaganza-save-huge-on-body-care-supplements-and-more/).
+3. **Ritual**: 40% off your order with a coupon code. [More details](https://www.retailmenot.com/view/ritual.com).
+4. **Swanson Vitamins**: 30% off Swanson Supplements plus free shipping on orders over $50. [More details](https://www.retailmenot.com/view/swansonvitamins.com).
+
+These offers are subject to terms and conditions, so it's advisable to check the specific details on the respective websites.
+Supervisor decided to assign task to: FINISH
