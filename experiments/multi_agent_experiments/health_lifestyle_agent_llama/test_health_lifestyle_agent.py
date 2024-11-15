@@ -5,6 +5,9 @@ from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_experimental.tools import PythonREPLTool
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+# from groq_llm_wrapper import GroqLLMWrapper
+from langchain_groq.chat_models import ChatGroq
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel
 from typing_extensions import TypedDict
@@ -17,6 +20,12 @@ from langchain_text_splitters import CharacterTextSplitter
 from langchain.tools.retriever import create_retriever_tool
 import operator
 from langchain_core.messages import BaseMessage, HumanMessage
+from transformers import AutoTokenizer
+
+# embeddings_model_name = "meta-llama/Llama-3.2-11B-Vision"
+# embeddings_model_name = 'meta-llama/Llama-3.2-1B'
+embeddings_model_name = 'sentence-transformers/all-MiniLM-L6-v2'
+chat_model='llama-3.2-11b-vision-preview'
 
 
 # 1. **Environment Setup**
@@ -27,8 +36,10 @@ def set_env_var(var: str):
 
 
 def setup_environment():
-    set_env_var("OPENAI_API_KEY")
+    # set_env_var("OPENAI_API_KEY")
     set_env_var("TAVILY_API_KEY")
+    set_env_var("GROQ_API_KEY")
+    set_env_var("HUGGINGFACE_API_KEY")
 
 
 # 2. **PDF Processing**
@@ -40,9 +51,31 @@ def load_and_prepare_documents(file_path: str, chunk_size: int = 1000, chunk_ove
     return text_splitter.split_documents(documents)
 
 
+def get_embeddings():
+    # return OpenAIEmbeddings()
+    if embeddings_model_name == 'meta-llama/Llama-3.2-1B':
+        tokenizer = AutoTokenizer.from_pretrained(embeddings_model_name)
+        if tokenizer.pad_token is None:
+            tokenizer.add_special_tokens({'pad_token': tokenizer.eos_token})
+
+        # Pass the tokenizer with the added padding token to HuggingFaceEmbeddings
+        embeddings = HuggingFaceEmbeddings(
+            model_name=embeddings_model_name
+        )
+
+        embeddings._client.tokenizer = tokenizer
+        print(f'Printing embeddings: {embeddings}')
+        return embeddings
+    
+    else:
+        print(f'Printing embeddings: {HuggingFaceEmbeddings(model_name=embeddings_model_name)}')
+        return HuggingFaceEmbeddings(model_name=embeddings_model_name)
+
+
 def create_knowledge_base(documents, agent_name, agent_description):
     """Create a retriever tool from documents."""
-    embeddings = OpenAIEmbeddings()
+    # embeddings = OpenAIEmbeddings()
+    embeddings = get_embeddings()
     db = FAISS.from_documents(documents, embeddings)
     retriever = db.as_retriever()
     return create_retriever_tool(retriever, agent_name, agent_description)
@@ -144,6 +177,11 @@ class AgentState(TypedDict):
     log: list[str]
 
 
+def get_llm():
+    # return ChatOpenAI(model="gpt-4o")
+    return ChatGroq(model=chat_model, temperature=0.0, max_retries=2)
+
+
 # 7. **Main Execution (Updated)**
 def main():
     setup_environment()
@@ -155,7 +193,7 @@ def main():
     health_tools = setup_tools(health_retriever_tool)
     lifestyle_tools = setup_tools(lifestyle_retriever_tool)
 
-    llm = ChatOpenAI(model="gpt-4o")
+    llm = get_llm()
     agents = create_agents(health_tools, lifestyle_tools, llm)
     graph = define_workflow(agents, llm)
 
