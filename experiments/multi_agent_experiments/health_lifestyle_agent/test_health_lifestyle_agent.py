@@ -3,7 +3,7 @@ import os
 from typing import Annotated, Sequence, Literal
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_experimental.tools import PythonREPLTool
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel
@@ -40,31 +40,83 @@ def load_and_prepare_documents(file_path: str, chunk_size: int = 1000, chunk_ove
     return text_splitter.split_documents(documents)
 
 
-def create_knowledge_base(documents, agent_name, agent_description):
-    """Create a retriever tool from documents."""
+def create_knowledge_base(documents, name,  agent_description):
+    """
+    Create a retriever tool from documents.
+    
+    Parameters:
+    - `documents`: List of split documents loaded from the data source.
+    - `agent_name`: Name of the agent using the tool.
+    - `agent_description`: Description of the agent's scope and tool capabilities.
+    """
     embeddings = OpenAIEmbeddings()
     db = FAISS.from_documents(documents, embeddings)
     retriever = db.as_retriever()
-    return create_retriever_tool(retriever, agent_name, agent_description)
+    return create_retriever_tool(
+        retriever,
+        "Retriever",
+        description=f"Tool for retrieving information about {agent_description}."
+    )
 
 
 # 3. **Tools Setup**
 def setup_tools(retriever_tool):
-    """Initialize all tools required for the workflow."""
-    tavily_tool = TavilySearchResults(max_results=5)
-    python_repl_tool = PythonREPLTool()
+    """
+    Initialize tools with clear descriptions of their purposes and inputs.
+
+    Parameters:
+    - `retriever_tool`: The retrieval tool for specific document queries.
+    """
+    tavily_tool = TavilySearchResults(
+        max_results=5,
+        description="Tool for searching the internet for the most relevant results. "
+                    "Input: A search query as a string."
+    )
+
     return {
         "retriever_tool": retriever_tool,
-        "tavily_tool": tavily_tool,
-        "python_repl_tool": python_repl_tool,
+        "tavily_tool": tavily_tool
     }
 
 
 def create_agents(tools1, tools2, llm):
-    """Create specific agents using the tools."""
-    healthcare_agent = create_react_agent(llm, tools=[tools1["retriever_tool"]])
-    lifestyle_agent = create_react_agent(llm, tools=[tools2["retriever_tool"], tools2["tavily_tool"]])
+    """
+    Create specific agents with access to their respective tools.
 
+    Parameters:
+    - `tools1`: Tools for the HealthcareAgent.
+    - `tools2`: Tools for the LifestyleAgent.
+    - `llm`: The core LLM model driving the agents.
+    """
+    health_prompt = """
+    Given the user's health records and prompts, provide insights into medication side effects, usage instructions, or potential conflicts. 
+    Trigger alerts for:
+    - Medication conflicts.
+    - Change in prescription.
+    - Scheduling reminders.
+    """
+    lifestyle_prompt = """
+    Based on the user's lifestyle preferences, suggest:
+    - Best offers or prices for medications or wellness products.
+    - Alternative food or medication options.
+    - Purchase links.
+    Trigger alerts for:
+    - Potential health conflicts with the suggested products.
+    """
+    visualize_system_message_health = SystemMessage(content=health_prompt)
+    visualize_system_message_lifestyle = SystemMessage(content=lifestyle_prompt)
+    healthcare_agent = create_react_agent(
+        llm,
+        tools=[tools1["retriever_tool"]],
+        #state_modifier=visualize_system_message_health
+        #description="Agent for managing healthcare-related tasks. It has access to the user's medical records and retrieves insights."
+    )
+    lifestyle_agent = create_react_agent(
+        llm,
+        tools=[tools2["retriever_tool"], tools2["tavily_tool"]],
+        #state_modifier=visualize_system_message_lifestyle
+        #description="Agent for providing lifestyle recommendations. It has access to dietary preferences, wellness data, and internet search."
+    )
     return {
         "healthcare_agent": healthcare_agent,
         "lifestyle_agent": lifestyle_agent,
@@ -79,11 +131,11 @@ def define_workflow(agents, llm):
     system_prompt = (
         "You are a supervisor tasked with managing a conversation between the"
         " following workers: {members}. Each worker has the following expertise:"
-        "\n- HealthcareAgent: healthcare assistant has access to the user's health records and designed to help users manage their health records and provide personalized medical insights."
-        "\n- LifestyleAgent: lifestyle assistant has access to the user's lifestyle records and designed to help users gain insghts on their dietary preferences, wellness routines, and provide personalized lifestyle recommendations. It also has access to browsing internet."
-        " Given the following user request, respond with the worker to act next."
-        " Each worker will perform a task and respond with their results and status."
-        " When finished, respond with FINISH."
+        "\n- HealthcareAgent: A healthcare assistant with access to the user's health records, medications, and medical insights. It is designed to answer questions related to healthcare and personal medical information."
+        "\n- LifestyleAgent: A lifestyle assistant with access to the user's lifestyle preferences, including dietary data and wellness routines. It can provide lifestyle recommendations and browse the internet to find relevant information."
+        " Your role is to decide which worker should handle the user's request."
+        " Provide clear instructions to the selected worker and ensure the workflow is completed efficiently."
+        " When all tasks are finished, respond with FINISH."
     )
     options = ["FINISH"] + members
 
@@ -126,15 +178,12 @@ def define_workflow(agents, llm):
     return workflow.compile()
 
 
-
-
 def agent_node(state, agent, name, log):
     """Run a node and format results."""
     result = agent.invoke(state)
     message_content = result["messages"][-1].content
     log.append(f"{name} completed task with response: {message_content}")
     return {"messages": [HumanMessage(content=message_content, name=name)]}
-
 
 
 class AgentState(TypedDict):
@@ -144,13 +193,21 @@ class AgentState(TypedDict):
     log: list[str]
 
 
-# 7. **Main Execution (Updated)**
+# 7. **Main Execution**
 def main():
     setup_environment()
     health_documents = load_and_prepare_documents("health_data")
     lifestyle_documents = load_and_prepare_documents("lifestyle_data")
-    health_retriever_tool = create_knowledge_base(health_documents, "HealthcareAgent", "Can retrieve medical documents information of patient")
-    lifestyle_retriever_tool = create_knowledge_base(lifestyle_documents, "LifestyleAgent", "Can retrieve lifestyle, dietary, and wellness information for personalized recommendations")
+    health_retriever_tool = create_knowledge_base(
+        health_documents,
+        "HealthcareAgent",
+        "retrieving medical document information for patients"
+    )
+    lifestyle_retriever_tool = create_knowledge_base(
+        lifestyle_documents,
+        "LifestyleAgent",
+        "retrieving lifestyle, dietary, and wellness information for personalized recommendations"
+    )
 
     health_tools = setup_tools(health_retriever_tool)
     lifestyle_tools = setup_tools(lifestyle_retriever_tool)
@@ -165,8 +222,7 @@ def main():
         {
             "messages": [
                 HumanMessage(
-                    #content="Which food should i avoid based on my preferences?"
-                    content="what are my dietary restrictions or food that i should avoid ? "
+                    content="I need a diabetes-friendly dinner recipe. Can you find one and confirm if it aligns with my health records and medications?"
                 )
             ],
             "log": log,
