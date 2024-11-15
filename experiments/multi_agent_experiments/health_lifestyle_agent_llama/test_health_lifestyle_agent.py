@@ -40,12 +40,12 @@ def load_and_prepare_documents(file_path: str, chunk_size: int = 1000, chunk_ove
     return text_splitter.split_documents(documents)
 
 
-def create_knowledge_base(documents):
+def create_knowledge_base(documents, agent_name, agent_description):
     """Create a retriever tool from documents."""
     embeddings = OpenAIEmbeddings()
     db = FAISS.from_documents(documents, embeddings)
     retriever = db.as_retriever()
-    return create_retriever_tool(retriever, "LifestyleAgent", "Can retrieve lifestyle, dietary, and wellness information for personalized recommendations")
+    return create_retriever_tool(retriever, agent_name, agent_description)
 
 
 # 3. **Tools Setup**
@@ -60,27 +60,27 @@ def setup_tools(retriever_tool):
     }
 
 
-def create_agents(tools, llm):
+def create_agents(tools1, tools2, llm):
     """Create specific agents using the tools."""
-    lifestyle_agent = create_react_agent(llm, tools=[tools["retriever_tool"]])
-    code_agent = create_react_agent(llm, tools=[tools["python_repl_tool"]])
+    healthcare_agent = create_react_agent(llm, tools=[tools1["retriever_tool"]])
+    lifestyle_agent = create_react_agent(llm, tools=[tools2["retriever_tool"], tools2["tavily_tool"]])
 
     return {
+        "healthcare_agent": healthcare_agent,
         "lifestyle_agent": lifestyle_agent,
-        "code_agent": code_agent,
     }
 
 
 def define_workflow(agents, llm):
     """Define the state graph for the workflow."""
-    members = ["LifestyleAgent", "Coder"]
+    members = ["HealthcareAgent", "LifestyleAgent"]
 
     # Supervisor prompt and LLM chain
     system_prompt = (
         "You are a supervisor tasked with managing a conversation between the"
         " following workers: {members}. Each worker has the following expertise:"
-        "\n- LifestyleAgent: lifestyle assistant designed to help users manage their health records and provide personalized medical insights."
-        "\n- Coder: Write python code."
+        "\n- HealthcareAgent: healthcare assistant has access to the user's health records and designed to help users manage their health records and provide personalized medical insights."
+        "\n- LifestyleAgent: lifestyle assistant has access to the user's lifestyle records and designed to help users gain insghts on their dietary preferences, wellness routines, and provide personalized lifestyle recommendations. It also has access to browsing internet."
         " Given the following user request, respond with the worker to act next."
         " Each worker will perform a task and respond with their results and status."
         " When finished, respond with FINISH."
@@ -88,7 +88,7 @@ def define_workflow(agents, llm):
     options = ["FINISH"] + members
 
     class routeResponse(BaseModel):
-        next: Literal["FINISH", "LifestyleAgent", "Coder"]
+        next: Literal["FINISH", "HealthcareAgent", "LifestyleAgent"]
 
     prompt = ChatPromptTemplate.from_messages(
         [
@@ -111,8 +111,8 @@ def define_workflow(agents, llm):
     workflow = StateGraph(AgentState)
 
     # Define agents directly without wrapping in functools.partial
+    workflow.add_node("HealthcareAgent", lambda state: agent_node(state, agents["healthcare_agent"], "HealthcareAgent", state["log"]))
     workflow.add_node("LifestyleAgent", lambda state: agent_node(state, agents["lifestyle_agent"], "LifestyleAgent", state["log"]))
-    workflow.add_node("Coder", lambda state: agent_node(state, agents["code_agent"], "Coder", state["log"]))
     workflow.add_node("supervisor", supervisor_agent)
 
     for member in members:
@@ -147,12 +147,16 @@ class AgentState(TypedDict):
 # 7. **Main Execution (Updated)**
 def main():
     setup_environment()
-    documents = load_and_prepare_documents("/root/net_handle/experiments/multi_agent_experiments/lifestyle_agent/lifestyle_data")
-    retriever_tool = create_knowledge_base(documents)
-    tools = setup_tools(retriever_tool)
+    health_documents = load_and_prepare_documents("health_data")
+    lifestyle_documents = load_and_prepare_documents("lifestyle_data")
+    health_retriever_tool = create_knowledge_base(health_documents, "HealthcareAgent", "Can retrieve medical documents information of patient")
+    lifestyle_retriever_tool = create_knowledge_base(lifestyle_documents, "LifestyleAgent", "Can retrieve lifestyle, dietary, and wellness information for personalized recommendations")
+
+    health_tools = setup_tools(health_retriever_tool)
+    lifestyle_tools = setup_tools(lifestyle_retriever_tool)
 
     llm = ChatOpenAI(model="gpt-4o")
-    agents = create_agents(tools, llm)
+    agents = create_agents(health_tools, lifestyle_tools, llm)
     graph = define_workflow(agents, llm)
 
     log = []
@@ -161,7 +165,8 @@ def main():
         {
             "messages": [
                 HumanMessage(
-                    content="Give me details about my diet plans?"
+                    #content="Which food should i avoid based on my preferences?"
+                    content="what are my dietary restrictions or food that i should avoid ? "
                 )
             ],
             "log": log,
