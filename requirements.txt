@@ -4,5 +4,6 @@ llama-index
 apscheduler
 serpapi
 scikit-learn
+requests
 openai
 sentence-transformers
