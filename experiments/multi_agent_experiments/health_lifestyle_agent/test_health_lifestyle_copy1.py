@@ -4,7 +4,7 @@ from typing import Annotated, Sequence, Literal
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_community.utilities.twilio import TwilioAPIWrapper
 from langchain_experimental.tools import PythonREPLTool
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel
@@ -18,19 +18,7 @@ from langchain_text_splitters import CharacterTextSplitter
 from langchain.tools.retriever import create_retriever_tool
 import operator
 from langchain_core.messages import BaseMessage, HumanMessage
-from pydantic import BaseModel, Field, ValidationError
-from enum import Enum
 
-class AgentName(str, Enum):
-    """Enumeration for agent names."""
-    HEALTHCARE = "HealthcareAgent"
-    LIFESTYLE = "LifestyleAgent"
-    FINISH = "FINISH"
-
-
-'''class RouteResponse(BaseModel):
-    """Model for supervisor's decision."""
-    next_agent: AgentName = Field(..., description="The next agent to handle the task.")'''
 
 # 1. **Environment Setup**
 def set_env_var(var: str):
@@ -53,133 +41,106 @@ def load_and_prepare_documents(file_path: str, chunk_size: int = 1000, chunk_ove
     return text_splitter.split_documents(documents)
 
 
-def create_knowledge_base(documents, agent_name, agent_description):
-    """Create a retriever tool from documents."""
+def create_knowledge_base(documents, name,  agent_description):
+    """
+    Create a retriever tool from documents.
+    
+    Parameters:
+    - `documents`: List of split documents loaded from the data source.
+    - `agent_name`: Name of the agent using the tool.
+    - `agent_description`: Description of the agent's scope and tool capabilities.
+    """
     embeddings = OpenAIEmbeddings()
     db = FAISS.from_documents(documents, embeddings)
     retriever = db.as_retriever()
-    return create_retriever_tool(retriever, agent_name, agent_description)
+    return create_retriever_tool(
+        retriever,
+        "Retriever",
+        description=f"Tool for retrieving information about {agent_description}."
+    )
 
 
 # 3. **Tools Setup**
-def setup_tools(retriever_tool):
-    """Initialize all tools required for the workflow."""
+def setup_tools(health_documents, lifestyle_documents):
+    """
+    Initialize tools with clear descriptions of their purposes and inputs.
+
+    Parameters:
+    - `retriever_tool`: The retrieval tool for specific document queries.
+    """
+    health_retriever_tool = create_knowledge_base(
+        health_documents,
+        "HealthcareAgent",
+        "retrieving medical document information for patients"
+    )
+    lifestyle_retriever_tool = create_knowledge_base(
+        lifestyle_documents,
+        "LifestyleAgent",
+        "retrieving lifestyle, dietary, and wellness information for personalized recommendations"
+    )
+
     tavily_tool = TavilySearchResults(
         max_results=5,
         description="Tool for searching the internet for the most relevant results. "
                     "Input: A search query as a string."
     )
+    twilio_tool = TwilioAPIWrapper(
+        account_sid= "AC8cda509b991547746f51b4559f4b24d7",#os.environ.get("TWILIO_ACCOUNT_SID"),
+        auth_token= "225c4fb55a2c430db88fb8ff80564664",#os.environ.get("TWILIO_AUTH_TOKEN"),
+        from_number= "whatsapp:+14155238886",#os.environ.get("TWILIO_FROM_NUMBER"),
+        #to_number=os.environ.get("TWILIO_TO_NUMBER"),
+    )
 
-    #tavily_tool = TavilySearchResults(max_results=5)
-    python_repl_tool = PythonREPLTool()
-  
     return {
-        "retriever_tool": retriever_tool,
+        "health_retriever_tool": health_retriever_tool,
+        "lifestyle_retriever_tool": lifestyle_retriever_tool,
         "tavily_tool": tavily_tool,
-        "python_repl_tool": python_repl_tool,
+        "twilio_tool": twilio_tool
     }
 
 
-def create_agents(tools1, tools2, llm):
-    """Create specific agents using the tools."""
-    healthcare_agent = create_react_agent(llm, tools=[tools1["retriever_tool"]])
-    lifestyle_agent = create_react_agent(llm, tools=[tools2["retriever_tool"], tools2["tavily_tool"]])
+def create_agents(tools, llm):
+    """
+    Create specific agents with access to their respective tools.
 
+    Parameters:
+    - `tools1`: Tools for the HealthcareAgent.
+    - `tools2`: Tools for the LifestyleAgent.
+    - `llm`: The core LLM model driving the agents.
+    """
+    health_prompt = """
+    Given the user's health records and prompts, provide insights into medication side effects, usage instructions, or potential conflicts. 
+    Trigger alerts for:
+    - Medication conflicts.
+    - Change in prescription.
+    - Scheduling reminders.
+    """
+    lifestyle_prompt = """
+    Based on the user's lifestyle preferences, suggest:
+    - Best offers or prices for medications or wellness products.
+    - Alternative food or medication options.
+    - Purchase links.
+    Trigger alerts for:
+    - Potential health conflicts with the suggested products.
+    """
+    visualize_system_message_health = SystemMessage(content=health_prompt)
+    visualize_system_message_lifestyle = SystemMessage(content=lifestyle_prompt)
+    healthcare_agent = create_react_agent(
+        llm,
+        tools=[tools["health_retriever_tool"]],
+        #state_modifier=visualize_system_message_health
+        #description="Agent for managing healthcare-related tasks. It has access to the user's medical records and retrieves insights."
+    )
+    lifestyle_agent = create_react_agent(
+        llm,
+        tools=[tools["lifestyle_retriever_tool"], tools["tavily_tool"]],
+        #state_modifier=visualize_system_message_lifestyle
+        #description="Agent for providing lifestyle recommendations. It has access to dietary preferences, wellness data, and internet search."
+    )
     return {
         "healthcare_agent": healthcare_agent,
         "lifestyle_agent": lifestyle_agent,
     }
-
-
-'''def define_workflow_pydantic(agents, llm):
-    """Define the state graph for the workflow using Pydantic."""
-    members = [AgentName.HEALTHCARE.value, AgentName.LIFESTYLE.value]
-
-    # Enhanced Supervisor Prompt
-    system_prompt = (
-        "You are a supervisor managing a conversation between the following workers:"
-        f"\n- {AgentName.HEALTHCARE}: A healthcare assistant with access to the user's health records."
-        " It provides medical insights, checks for medication conflicts, and sets health-related reminders."
-        f"\n- {AgentName.LIFESTYLE}: A lifestyle assistant with access to the user's lifestyle records and browsing capabilities."
-        " It provides dietary insights, suggests alternative foods or medications, and finds the best offers."
-        "\nYour task is to:"
-        "\n1. Decide which worker should act next based on the conversation."
-        "\n2. Consider interdependencies between health and lifestyle tasks."
-        "\n3. Respond with 'FINISH' if no further tasks are required."
-        " Given the user request and conversation history, respond with the worker to act next or FINISH."
-    )
-
-    class RouteResponse(BaseModel):
-        next_agent: AgentName = Field(..., description="The next agent to handle the task.")
-
-    # Supervisor Chain Prompt
-    prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", system_prompt),
-            MessagesPlaceholder(variable_name="messages"),
-            (
-                "system",
-                "Based on the conversation above, who should act next?"
-                f" Choose one of: {', '.join([member for member in members + [AgentName.FINISH.value]])}."
-            ),
-        ]
-    )
-
-    def supervisor_agent(state):
-        """Supervisor agent logic to decide the next task."""
-        try:
-            supervisor_chain = prompt | llm.with_structured_output(RouteResponse)
-            decision = supervisor_chain.invoke(state)
-            
-            # Log decision
-            state["log"].append(f"Supervisor decision: {decision.next_agent}")
-            
-            # Add 'next_agent' to state
-            state["next_agent"] = decision.next_agent  # Ensure this is added to the state
-            
-            return decision
-        except ValidationError as e:
-        #state["log"].append(f"Error in supervisor decision: {str(e)}")
-            raise
-        
-    def log_node_output(state, name, result):
-        """Log the result of a node's operation."""
-        message_content = result["messages"][-1].content
-        state["log"].append(f"{name} completed task: {message_content}")
-        return {"messages": [HumanMessage(content=message_content, name=name)]}
-
-    # Node Logic
-    def healthcare_node(state):
-        """HealthcareAgent performs its task."""
-        result = agents["healthcare_agent"].invoke(state)
-        return log_node_output(state, AgentName.HEALTHCARE.value, result)
-
-    def lifestyle_node(state):
-        """LifestyleAgent performs its task."""
-        result = agents["lifestyle_agent"].invoke(state)
-        return log_node_output(state, AgentName.LIFESTYLE.value, result)
-
-    # Initialize Workflow Graph
-    workflow = StateGraph(AgentState)
-
-    workflow.add_node(AgentName.HEALTHCARE.value, healthcare_node)
-    workflow.add_node(AgentName.LIFESTYLE.value, lifestyle_node)
-    workflow.add_node("supervisor", supervisor_agent)
-
-    # Supervisor Edges
-    for member in members:
-        workflow.add_edge(member, "supervisor")
-
-    # Conditional Workflow Execution
-    conditional_map = {member: member for member in members}
-    conditional_map[AgentName.FINISH.value] = END
-    workflow.add_conditional_edges("supervisor", lambda x: x["next_agent"].value, conditional_map)
-
-
-    # Start Node
-    workflow.add_edge(START, "supervisor")
-
-    return workflow.compile()'''
 
 
 def define_workflow(agents, llm):
@@ -190,19 +151,17 @@ def define_workflow(agents, llm):
     system_prompt = (
         "You are a supervisor tasked with managing a conversation between the"
         " following workers: {members}. Each worker has the following expertise:"
-        "\n- HealthcareAgent: healthcare assistant has access to the user's health records and designed to help users manage their health records and provide personalized medical insights."
-        "\n- LifestyleAgent: lifestyle assistant has access to the user's lifestyle records and designed to help users gain insghts on their dietary preferences, wellness routines, and provide personalized lifestyle recommendations. It also has access to browsing internet."
-        " Given the following user request, respond with the worker to act next."
-        " Each worker will perform a task and respond with their results and status."
-        " When finished, respond with FINISH."
+        "\n- HealthcareAgent: A healthcare assistant with access to the user's health records, medications, and medical insights. It is designed to answer questions related to healthcare and personal medical information."
+        "\n- LifestyleAgent: A lifestyle assistant with access to the user's lifestyle preferences, including dietary data and wellness routines. It can provide lifestyle recommendations and browse the internet to find relevant information."
+        " Your role is to decide which worker should handle the user's request."
+        " Provide clear instructions to the selected worker and ensure the workflow is completed efficiently."
+        " When all tasks are finished, respond with FINISH."
     )
-    
     options = ["FINISH"] + members
 
     class routeResponse(BaseModel):
         next: Literal["FINISH", "HealthcareAgent", "LifestyleAgent"]
 
-    # Enhanced Prompt with Context
     prompt = ChatPromptTemplate.from_messages(
         [
             ("system", system_prompt),
@@ -239,15 +198,12 @@ def define_workflow(agents, llm):
     return workflow.compile()
 
 
-
-
 def agent_node(state, agent, name, log):
     """Run a node and format results."""
     result = agent.invoke(state)
     message_content = result["messages"][-1].content
     log.append(f"{name} completed task with response: {message_content}")
     return {"messages": [HumanMessage(content=message_content, name=name)]}
-
 
 
 class AgentState(TypedDict):
@@ -257,15 +213,12 @@ class AgentState(TypedDict):
     log: list[str]
 
 
-# 7. **Main Execution (Updated)**
+# 7. **Main Execution**
 def main():
     setup_environment()
     health_documents = load_and_prepare_documents("health_data")
     lifestyle_documents = load_and_prepare_documents("lifestyle_data")
-    #health_retriever_tool = create_knowledge_base(health_documents, "HealthcareAgent", "Can retrieve medical documents information of patient")
-    #lifestyle_retriever_tool = create_knowledge_base(lifestyle_documents, "LifestyleAgent", "Can retrieve lifestyle, dietary, and wellness information for personalized recommendations")
-
-    health_retriever_tool = create_knowledge_base(
+    '''health_retriever_tool = create_knowledge_base(
         health_documents,
         "HealthcareAgent",
         "retrieving medical document information for patients"
@@ -274,14 +227,15 @@ def main():
         lifestyle_documents,
         "LifestyleAgent",
         "retrieving lifestyle, dietary, and wellness information for personalized recommendations"
-    )
-    health_tools = setup_tools(health_retriever_tool)
-    lifestyle_tools = setup_tools(lifestyle_retriever_tool)
+    )'''
+
+    #health_tools = setup_tools(health_retriever_tool)
+    #lifestyle_tools = setup_tools(lifestyle_retriever_tool)
+    tools = setup_tools(health_documents, lifestyle_documents)
 
     llm = ChatOpenAI(model="gpt-4o")
-    agents = create_agents(health_tools, lifestyle_tools, llm)
+    agents = create_agents(tools, llm)
     graph = define_workflow(agents, llm)
-    #graph = define_workflow_pydantic(agents, llm)
 
     log = []
     final_state = None
@@ -289,8 +243,7 @@ def main():
         {
             "messages": [
                 HumanMessage(
-                    #content="Which food should i avoid based on my preferences?"
-                    content="give me some protien rich food"
+                    content="I need a diabetes-friendly dinner recipe. Can you find one and confirm if it aligns with my health records and medications?"
                 )
             ],
             "log": log,
@@ -310,6 +263,8 @@ def main():
     if final_state:
         print("\n--- Final Message ---\n")
         print(final_state["messages"][-1].content)
+
+    tools["twilio_tool"].run("test message from model output", "whatsapp: +447774839645")
 
 
 if __name__ == "__main__":

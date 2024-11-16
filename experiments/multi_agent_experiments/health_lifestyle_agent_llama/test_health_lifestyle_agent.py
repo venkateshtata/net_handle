@@ -27,7 +27,8 @@ from langchain_ollama import OllamaEmbeddings
 # embeddings_model_name = 'meta-llama/Llama-3.2-1B'
 embeddings_model_name = 'sentence-transformers/all-MiniLM-L6-v2'
 # chat_model='llama-3.2-11b-vision-preview'
-chat_model = 'llama-3.2-90b-vision-preview'
+# chat_model = 'llama-3.2-90b-vision-preview'
+chat_model = 'llama-3.1-70b-versatile'
 
 
 # 1. **Environment Setup**
@@ -191,7 +192,7 @@ class AgentState(TypedDict):
 
 
 def get_llm():
-    # return ChatOpenAI(model="gpt-4o")
+    return ChatOpenAI(model="gpt-4o")
     return ChatGroq(model=chat_model, temperature=0.0, max_retries=2)
 
 
