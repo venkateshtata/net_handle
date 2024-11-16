@@ -3,6 +3,7 @@ import os
 from typing import Annotated, Sequence, Literal
 from langchain_community.tools.tavily_search import TavilySearchResults
 from langchain_community.utilities.twilio import TwilioAPIWrapper
+from twilio.rest import Client
 from langchain_experimental.tools import PythonREPLTool
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -261,7 +262,22 @@ def main():
         print(entry)
 
     print("Sending message to whatsapp")
-    tools["twilio_tool"].run("test message from model output", "whatsapp:+447774839645")
+
+    
+
+    account_sid = 'AC8cda509b991547746f51b4559f4b24d7'
+    auth_token = '225c4fb55a2c430db88fb8ff80564664'
+    client = Client(account_sid, auth_token)
+
+    message = client.messages.create(
+    from_='whatsapp:+14155238886',
+    content_sid='HX65e9d0cd1379ac8931e4fa4bdeb9ac60',
+    content_variables='{"1":"message1","2":"message2"}',
+    to='whatsapp:+447774839645'
+    )
+
+    print(message.sid)
+    #tools["twilio_tool"].run("hello world", "whatsapp:+447774839645")
 
     if final_state:
         print("\n--- Final Message ---\n")
