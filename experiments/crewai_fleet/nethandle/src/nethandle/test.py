@@ -5,30 +5,28 @@ import json
 from crewai import Agent
 from crewai import LLM
 from crewai.tasks.task_output import TaskOutput
-#from crewai_tools import PDFSearchTool
 from crewai import LLM
 from crewai_tools import DOCXSearchTool
+from crewai_tools import CodeInterpreterTool
+from crewai_tools import SerperDevTool
+from crewai_tools import WebsiteSearchTool
+from langchain_community.document_loaders import UnstructuredWordDocumentLoader
 
 
-llm = LLM(model="groq/llama3-8b-8192", api_key="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")
+# Healthcare tools
+CodeInterpreterTool_crewtool = CodeInterpreterTool()
+
+# Lifestyle tools
+SerperDevTool_t = SerperDevTool()
+WebsiteSearchTool_crewtool = WebsiteSearchTool()
 
 
 health_rag_tool = DOCXSearchTool(docx='/root/net_handle/experiments/crewai_fleet/nethandle/src/nethandle/user_data/health_monitoring_data.docx')
 lifestyle_rag_tool = DOCXSearchTool(docx='/root/net_handle/experiments/crewai_fleet/nethandle/src/nethandle/user_data/lifestyle_advisor_data.docx')
 
 
-# search_tool = SerperDevTool()
 
-
-
-def callback_function(output: TaskOutput):
-    # Do something after the task is completed
-    # Example: Send an email to the manager
-    print(f"""
-        Task 1 completed!
-        Task: {output.description}
-        Output: {output.raw}
-    """)
+llm = LLM(model="groq/llama3-8b-8192", api_key="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")
 
 
 health_monitoring_agent = Agent(
@@ -46,7 +44,7 @@ health_monitoring_task = Task(
         #"A detailed summary of the user's current health metrics, "
         #"trends based on past data, potential risks, and alerts or reminders for health-related tasks."
     #),
-    tools=[health_rag_tool],
+    tools=[health_rag_tool, CodeInterpreterTool_crewtool],
 )
 
 
@@ -70,7 +68,7 @@ lifestyle_advisor_task = Task(
         #"and relaxation techniques, that align with the user's health conditions and preferences."
     #),
     expected_output="A bullet list summary of the top 5 most important lifestyle recommendations on the question {topic}.",
-    tools=[lifestyle_rag_tool],
+    tools=[lifestyle_rag_tool, SerperDevTool_t, WebsiteSearchTool_crewtool],
     # context=[task1]
 )
 
@@ -83,6 +81,6 @@ crew = Crew(
 )
 
 
-result = crew.kickoff(inputs={'topic': 'give summary of my doctor visits ?'})
+result = crew.kickoff(inputs={'topic': 'How can Rachel Kim adjust her exercise routine to optimize blood sugar levels without overexerting her cardiovascular system, given her current health metrics and dietary plans?'})
 
 print('result: ', result)
