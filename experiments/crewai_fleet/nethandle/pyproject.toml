@@ -1,0 +1,20 @@
+[project]
+name = "nethandle"
+version = "0.1.0"
+description = "nethandle using crewAI"
+authors = [{ name = "Your Name", email = "you@example.com" }]
+requires-python = ">=3.10,<=3.13"
+dependencies = [
+    "crewai[tools]>=0.80.0,<1.0.0"
+]
+
+[project.scripts]
+nethandle = "nethandle.main:run"
+run_crew = "nethandle.main:run"
+train = "nethandle.main:train"
+replay = "nethandle.main:replay"
+test = "nethandle.main:test"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
