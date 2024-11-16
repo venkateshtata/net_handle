@@ -2,6 +2,7 @@ import getpass
 import os
 from typing import Annotated, Sequence, Literal
 from langchain_community.tools.tavily_search import TavilySearchResults
+from langchain_community.utilities.twilio import TwilioAPIWrapper
 from langchain_experimental.tools import PythonREPLTool
 from langchain_core.messages import HumanMessage
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder

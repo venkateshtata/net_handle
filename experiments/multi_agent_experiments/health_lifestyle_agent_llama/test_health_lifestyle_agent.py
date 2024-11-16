@@ -21,11 +21,13 @@ from langchain.tools.retriever import create_retriever_tool
 import operator
 from langchain_core.messages import BaseMessage, HumanMessage
 from transformers import AutoTokenizer
+from langchain_ollama import OllamaEmbeddings
 
 # embeddings_model_name = "meta-llama/Llama-3.2-11B-Vision"
 # embeddings_model_name = 'meta-llama/Llama-3.2-1B'
 embeddings_model_name = 'sentence-transformers/all-MiniLM-L6-v2'
-chat_model='llama-3.2-11b-vision-preview'
+# chat_model='llama-3.2-11b-vision-preview'
+chat_model = 'llama-3.2-90b-vision-preview'
 
 
 # 1. **Environment Setup**
@@ -51,21 +53,30 @@ def load_and_prepare_documents(file_path: str, chunk_size: int = 1000, chunk_ove
     return text_splitter.split_documents(documents)
 
 
-def get_embeddings():
+def get_embeddings(embeddings_model):
     # return OpenAIEmbeddings()
-    if embeddings_model_name == 'meta-llama/Llama-3.2-1B':
-        tokenizer = AutoTokenizer.from_pretrained(embeddings_model_name)
-        if tokenizer.pad_token is None:
-            tokenizer.add_special_tokens({'pad_token': tokenizer.eos_token})
+    if embeddings_model.lower() == 'huggingface':
+        if embeddings_model_name == 'meta-llama/Llama-3.2-1B':
+            tokenizer = AutoTokenizer.from_pretrained(embeddings_model_name)
+            if tokenizer.pad_token is None:
+                tokenizer.add_special_tokens({'pad_token': tokenizer.eos_token})
 
-        # Pass the tokenizer with the added padding token to HuggingFaceEmbeddings
-        embeddings = HuggingFaceEmbeddings(
-            model_name=embeddings_model_name
-        )
+            # Pass the tokenizer with the added padding token to HuggingFaceEmbeddings
+            embeddings = HuggingFaceEmbeddings(
+                model_name=embeddings_model_name
+            )
 
-        embeddings._client.tokenizer = tokenizer
-        print(f'Printing embeddings: {embeddings}')
-        return embeddings
+            embeddings._client.tokenizer = tokenizer
+            print(f'Printing {embeddings_model} embeddings: {embeddings}')
+            return embeddings
+
+    elif embeddings_model.lower() == 'openai':
+        print(f'Printing {embeddings_model} embeddings: {OpenAIEmbeddings()}')
+        return OpenAIEmbeddings()
+    
+    elif embeddings_model.lower() == 'ollama':
+        print(f'Printing {embeddings_model} embeddings: {OllamaEmbeddings(model=embeddings_model_name)}')
+        return OllamaEmbeddings(model=embeddings_model_name)
     
     else:
         print(f'Printing embeddings: {HuggingFaceEmbeddings(model_name=embeddings_model_name)}')
@@ -74,8 +85,10 @@ def get_embeddings():
 
 def create_knowledge_base(documents, agent_name, agent_description):
     """Create a retriever tool from documents."""
-    # embeddings = OpenAIEmbeddings()
-    embeddings = get_embeddings()
+    used_embeddings = 'OpenAI'
+    # used_embeddings = 'Ollama'
+    # used_embeddings = 'HuggingFace'
+    embeddings = get_embeddings(used_embeddings)
     db = FAISS.from_documents(documents, embeddings)
     retriever = db.as_retriever()
     return create_retriever_tool(retriever, agent_name, agent_description)
