@@ -1,6 +1,5 @@
 from environment.setup import setup_environment
 from pdf_processing.processor import load_and_prepare_documents
-from tools.retriever import create_knowledge_base
 from tools.setup import setup_tools
 from agents.creation import create_agents
 from agents.workflow import define_workflow
@@ -23,14 +22,11 @@ def main():
         print("lifestyle_data loaded")
     
 
-    health_retriever_tool = create_knowledge_base(health_documents, "HealthcareAgent", "retrieving medical document information for patients")
-    lifestyle_retriever_tool = create_knowledge_base(lifestyle_documents, "LifestyleAgent", "retrieving lifestyle, dietary, and wellness information for personalized recommendations")
-
-    health_tools = setup_tools(health_retriever_tool)
-    lifestyle_tools = setup_tools(lifestyle_retriever_tool)
+    
+    tools = setup_tools(health_documents, lifestyle_documents)
 
     llm = ChatOpenAI(model="gpt-4o")
-    agents = create_agents(health_tools, lifestyle_tools, llm)
+    agents = create_agents(tools, llm)
     graph = define_workflow(agents, llm)
 
     log = []

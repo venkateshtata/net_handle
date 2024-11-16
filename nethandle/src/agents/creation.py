@@ -2,7 +2,7 @@ from langchain_core.messages import SystemMessage
 from langgraph.prebuilt import create_react_agent
 
 
-def create_agents(tools1, tools2, llm):
+def create_agents(tools, llm):
     """
     Create specific agents with access to their respective tools.
 
@@ -28,11 +28,11 @@ def create_agents(tools1, tools2, llm):
     """
     healthcare_agent = create_react_agent(
         llm,
-        tools=[tools1["retriever_tool"]],
+        tools=[tools["health_retriever_tool"]],
     )
     lifestyle_agent = create_react_agent(
         llm,
-        tools=[tools2["retriever_tool"], tools2["tavily_tool"]],
+        tools=[tools["lifestyle_retriever_tool"], tools["tavily_tool"]],
     )
     return {
         "healthcare_agent": healthcare_agent,
