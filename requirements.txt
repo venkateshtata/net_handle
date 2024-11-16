@@ -12,3 +12,5 @@ langchain_experimental
 langchain_openai
 langgraph
 faiss-gpu
+groq
+twilio
