@@ -45,7 +45,7 @@ const AgentStore = () => {
     <div className="min-h-full text-white p-4 grid place-items-center items-start">
       <div className="sticky top-0 mb-6 h-40 w-full flex flex-col items-center">
         <div className="bg-white min-w-full text-center">
-          <h1 className="text-4xl text-black font-silkscreen">Agent Hub </h1>
+          <h1 className="text-4xl text-black font-silkscreen">Agent Hub</h1>
         </div>
         <div className="w-full grid place-items-center backdrop-blur-xl">
           <div className="w-full grid place-items-center  bg-gradient-to-t from-transparent to-white">

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { flushSync, useState } from "react";
 import { Dialog, Transition, TransitionChild, DialogTitle, DialogPanel } from "@headlessui/react";
 
 const FleetChat = () => {
@@ -6,12 +6,51 @@ const FleetChat = () => {
   const [messages, setMessages] = useState([]);
   const [message, setMessage] = useState("");
 
+
+  // UNCOMMENT WHEN API
+  // async function postMessage (message) {
+  //   const res = await fetch("https://localhost/fleet/messages", {
+  //       method: "POST",
+  //       headers: {
+  //       "Content-Type": "application/json",
+  //       },
+  //           body: JSON.stringify({
+  //             id: 1,
+  //             message: message,
+  //             timestamp: new Date.toLocaleString()
+  //       })
+  //   });
+  //  return res;
+
+
+
+  const tmp_res = {
+    "status": "success",
+    "timestamp": "2024-11-15T14:30:00Z",
+    "body": [
+        {
+            "id": "1",
+            "message": "Hey, how are you?",
+        },
+    ]
+}
+
   const sendMessage = () => {
     if (message.trim()) {
       setMessages([...messages, { text: message, sender: "user" }]);
+      setMessages([...messages, {text: tmp_res["body"][0]["message"], sender: "fleet"}]);
+      // setMessages([...messages,  { text: message, sender: "user" }, {text: tmp_res["body"][0]["message"], sender: "fleet"}])
+      // console.log(tmp_res["body"][0])
+      console.log(messages);
       setMessage(""); // Reset input
     }
   };
+
+  const handleKeyPress = (event) => {
+    if (event.key === 'Enter') {
+        sendMessage(); // Trigger the same function as the button
+    }
+  }
 
   return (
     <>
@@ -67,6 +106,7 @@ const FleetChat = () => {
                   type="text"
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
+                  onKeyDown={handleKeyPress}
                   className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Type a message..."
                 />

@@ -16,11 +16,23 @@ let [isOpen, setIsOpen] = useState(false);
     <>
         <Button
             onClick={open}
-            className="max-h-30 max-w-40 w-40 h-30 flex border rounded-lg bg-white hover:shadow-md transition duration-500"
+            className="max-h-30 min-w-40 max-w-80 w-40 h-30 flex border rounded-lg bg-white hover:shadow-md transition duration-500"
         >
-            <div className="h-full w-full flex flex-row">
-                <div className="h-full max-w-10">
-                    <img src="https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg?semt=ais_hybrid" alt="avatar" />
+            <div className="h-full w-full flex flex-row items-center">
+                <div className="h-full max-w-10 ml-4 flex justify-center items-center">
+                    <img 
+                        src="https://img.freepik.com/free-psd/3d-illustration-person-with-sunglasses_23-2149436188.jpg?semt=ais_hybrid" 
+                        alt="avatar" 
+                        className="max-w-full max-h-full rounded-lg"
+                    />
+                </div>
+                <div className='ml-6 h-full flex item-center flex-col'>
+                    <h1 className='text-black text-sm'>
+                        Medic Help
+                    </h1>
+                    <p className='text-sm text-black text-left'>
+                        Lorem ipsum tota tota
+                    </p>
                 </div>
             </div>
         </Button>
