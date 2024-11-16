@@ -243,7 +243,7 @@ def main():
         {
             "messages": [
                 HumanMessage(
-                    content="I need a diabetes-friendly dinner recipe. Can you find one and confirm if it aligns with my health records and medications?"
+                    content="Give me my name"
                 )
             ],
             "log": log,
@@ -260,11 +260,14 @@ def main():
     for entry in log:
         print(entry)
 
+    print("Sending message to whatsapp")
+    tools["twilio_tool"].run("test message from model output", "whatsapp:+447774839645")
+
     if final_state:
         print("\n--- Final Message ---\n")
         print(final_state["messages"][-1].content)
 
-    tools["twilio_tool"].run("test message from model output", "whatsapp: +447774839645")
+    
 
 
 if __name__ == "__main__":

@@ -59,5 +59,7 @@ def main():
         print("\n--- Final Message ---\n")
         print(final_state["messages"][-1].content)
 
+    return final_state
+
 if __name__ == "__main__":
     main()

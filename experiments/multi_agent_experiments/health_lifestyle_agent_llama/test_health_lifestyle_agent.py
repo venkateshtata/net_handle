@@ -192,8 +192,8 @@ class AgentState(TypedDict):
 
 
 def get_llm():
-    return ChatOpenAI(model="gpt-4o")
-    return ChatGroq(model=chat_model, temperature=0.0, max_retries=2)
+    # return ChatOpenAI(model="gpt-4o")
+    return ChatGroq(model=chat_model, temperature=0.8, max_retries=20)
 
 
 # 7. **Main Execution (Updated)**
