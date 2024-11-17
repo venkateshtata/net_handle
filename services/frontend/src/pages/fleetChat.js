@@ -1,128 +1,155 @@
-import { flushSync, useState } from "react";
-import { Dialog, Transition, TransitionChild, DialogTitle, DialogPanel } from "@headlessui/react";
+import React, { useState, useEffect } from 'react';
+import { Transition } from '@headlessui/react';
+import ReactMarkdown from 'react-markdown';
 
 const FleetChat = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [messages, setMessages] = useState([]);
-  const [message, setMessage] = useState("");
+  const [messages, setMessages] = useState([{
+    sender: "bot", content: "Hey there Bob! How can *we* be of help?"
+  }]);
+  const [isTyping, setIsTyping] = useState(false);
+  const [inputValue, setInputValue] = useState('');
 
-
-  // UNCOMMENT WHEN API
-  // async function postMessage (message) {
-  //   const res = await fetch("https://localhost/fleet/messages", {
-  //       method: "POST",
-  //       headers: {
-  //       "Content-Type": "application/json",
-  //       },
-  //           body: JSON.stringify({
-  //             id: 1,
-  //             message: message,
-  //             timestamp: new Date.toLocaleString()
-  //       })
-  //   });
-  //  return res;
-
-
-
-  const tmp_res = {
-    "status": "success",
-    "timestamp": "2024-11-15T14:30:00Z",
-    "body": [
-        {
-            "id": "1",
-            "message": "Hey, how are you?",
+  async function postMessage(message) {
+    console.log('🚀 Initiating API call with message:', message);
+    let data = {
+      topic: message
+    };
+    try {
+      console.log('📡 Sending request to API...');
+      const res = await fetch("https://f1e4-38-29-145-10.ngrok-free.app/process_query", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-    ]
-}
-
-  const sendMessage = () => {
-    if (message.trim()) {
-      setMessages([...messages, { text: message, sender: "user" }]);
-      setMessages([...messages, {text: tmp_res["body"][0]["message"], sender: "fleet"}]);
-      // setMessages([...messages,  { text: message, sender: "user" }, {text: tmp_res["body"][0]["message"], sender: "fleet"}])
-      // console.log(tmp_res["body"][0])
-      console.log(messages);
-      setMessage(""); // Reset input
-    }
-  };
-
-  const handleKeyPress = (event) => {
-    if (event.key === 'Enter') {
-        sendMessage(); // Trigger the same function as the button
+        body: JSON.stringify(data),
+      });
+      console.log('📥 Raw API response status:', res.status);
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+      const jsonResponse = await res.json();
+      console.log('✅ Parsed API response structure:', {
+        hasResult: !!jsonResponse.result,
+        hasResponse: !!jsonResponse.result?.response,
+        responseLength: jsonResponse.result?.response?.length
+      });
+      return jsonResponse;
+    } catch (error) {
+      console.error('❌ postMessage error:', {
+        message: error.message,
+        stack: error.stack,
+        data: data
+      });
+      throw error;
     }
   }
 
+  const sendMessage = async (message) => {
+    console.log('📝 Starting sendMessage flow with:', message);
+    setMessages((prev) => {
+      console.log('💬 Adding user message to chat');
+      return [...prev, { sender: 'user', content: message }];
+    });
+    setInputValue('');
+    setIsTyping(true);
+    
+    try {
+      const response = await postMessage(message);
+      console.log('📨 Processing response structure:', {
+        hasResult: !!response.result,
+        responseContent: response.result?.response?.substring(0, 50) + '...'
+      });
+      
+      if (!response.result?.response) {
+        console.warn('⚠️ Missing result.response in:', response);
+        throw new Error('Invalid response format');
+      }
+      
+      setMessages((prev) => {
+        console.log('🤖 Adding bot response to chat');
+        return [
+          ...prev,
+          { 
+            sender: 'bot', 
+            content: response.result.response
+          },
+        ];
+      });
+    } catch (error) {
+      console.error('💥 sendMessage error:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack
+      });
+      setMessages((prev) => [
+        ...prev,
+        { sender: 'bot', content: "I'm sorry. Something went wrong. Please try again in some time." },
+      ]);
+    } finally {
+      console.log('🏁 Completing message flow');
+      setIsTyping(false);
+    }
+  };
+
   return (
-    <>
-      {/* Trigger Button */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 right-4 p-3 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700"
-      >
-        Open Chat
-      </button>
-
-      {/* Chat Window Modal */}
-      <Transition show={isOpen} as="div">
-        <Dialog
-          onClose={() => setIsOpen(false)}
-          className="fixed inset-0 z-50 flex items-end justify-center p-4"
-        >
-          <TransitionChild
-            enter="transition ease-out duration-300"
-            enterFrom="opacity-0 translate-y-4"
-            enterTo="opacity-100 translate-y-0"
-            leave="transition ease-in duration-200"
-            leaveFrom="opacity-100 translate-y-0"
-            leaveTo="opacity-0 translate-y-4"
+    <div className="h-full flex flex-col bg-white">
+      <div className="flex-grow overflow-y-auto p-4 scrollbar-hide">
+        {messages.map((msg, idx) => (
+          <div
+            key={idx}
+            className={`flex ${
+              msg.sender === 'user' ? 'justify-end' : 'justify-start'
+            } mb-2`}
           >
-            <DialogPanel className="w-full max-w-md p-4 bg-white rounded-lg shadow-lg">
-              <DialogTitle className="text-lg font-bold">Chat</DialogTitle>
-              <div className="mt-2 h-60 overflow-y-auto border rounded-md p-2">
-                {/* Messages */}
-                {messages.map((msg, index) => (
-                  <div
-                    key={index}
-                    className={`mb-2 ${
-                      msg.sender === "user" ? "text-right" : "text-left"
-                    }`}
-                  >
-                    <span
-                      className={`inline-block px-4 py-2 rounded-lg ${
-                        msg.sender === "user"
-                          ? "bg-blue-100 text-blue-800"
-                          : "bg-gray-200 text-gray-800"
-                      }`}
-                    >
-                      {msg.text}
-                    </span>
-                  </div>
-                ))}
+            <div
+              className={`max-w-xs p-3 rounded-lg ${
+                msg.sender === 'user'
+                  ? 'bg-black text-white rounded-tl-3xl rounded-bl-3xl rounded-tr-3xl rounded-br-sm shadow-sm shadow-md'
+                  : 'bg-gray-200 text-black rounded-tl-3xl rounded-bl-sm rounded-tr-3xl rounded-br-3xl shadow-md'
+              }`}
+            >
+              <ReactMarkdown>{msg.content}</ReactMarkdown>
+            </div>
+          </div>
+        ))}
+        {isTyping && (
+          <div className="flex justify-start mb-2">
+            <div className="max-w-xs p-3 bg-gray-200 text-black rounded-lg">
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse"></div>
+                <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse delay-75"></div>
+                <div className="w-2 h-2 bg-gray-500 rounded-full animate-pulse delay-150"></div>
               </div>
-
-              {/* Input Field */}
-              <div className="mt-4 flex items-center">
-                <input
-                  type="text"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                  onKeyDown={handleKeyPress}
-                  className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Type a message..."
-                />
-                <button
-                  onClick={sendMessage}
-                  className="ml-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                >
-                  Send
-                </button>
-              </div>
-            </DialogPanel>
-          </TransitionChild>
-        </Dialog>
-      </Transition>
-    </>
+            </div>
+          </div>
+        )}
+      </div>
+      <div className="p-4">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (inputValue.trim()) sendMessage(inputValue);
+          }}
+        >
+          <div className="flex items-center bg-black rounded-3xl overflow-hidden opacity-80 shadow-2xl-dark transition duration-500">
+            <input
+              type="text"
+              className="flex-grow px-6 py-2 outline-none text-white bg-black opacity-80"
+              placeholder="Type a message..."
+              value={inputValue}
+              onChange={(e) => setInputValue(e.target.value)}
+            />
+            <button
+              type="submit"
+              className="px-4 py-2 font-roboto bg-black text-white hover:bg-white hover:text-black transition duration-400 hover:shadow-md rounded-full m-1 min-w-24"
+            >
+              Send
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
   );
-}
+};
 
 export default FleetChat;

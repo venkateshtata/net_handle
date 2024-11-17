@@ -3,19 +3,20 @@ import clsx from 'clsx';
 import { Tab, TabGroup, TabList, TabPanel, TabPanels } from '@headlessui/react';
 import AgentStore from '../pages/agentStore';
 import FleetChat from '../pages/fleetChat';
+import MyFleet from '../pages/myFleet';
 
 const navbarItems = [
   {
     name: 'My Fleet',
-    page: [],
+    page: [<MyFleet />],
   },
   {
     name: 'Agent Hub',
-    page: [],
+    page: [<AgentStore/>],
   },
   {
     name: 'Fleet Chat',
-    page: [],
+    page: [<FleetChat />],
   },
 ];
 
@@ -38,9 +39,17 @@ const Navbar = () => {
           </TabList>
         </div>
         <TabPanels className="flex w-full h-full py-10">
-          <div className="mb-10 h-11/12 w-11/12 rounded-lg bg-white border shadow-inner-dark overflow-y-scroll"> {/* scrollbar-hide */}
-            {/* <AgentStore /> */}
-            <FleetChat />
+          <div className="mb-10 h-11/12 w-11/12 rounded-lg bg-white border-solid border-black border-2 shadow-lg hover:shadow-2xl transition duration-500 overflow-y-scroll scrollbar-hide"> {/* shadow-inner-dark*/}
+            {
+              navbarItems.map(({page}) => (
+                <TabPanel
+                  key={page}
+                  className="h-full"
+                >
+                  {page}
+                </TabPanel>
+              ))
+            }
           </div>
         </TabPanels>
       </TabGroup>
