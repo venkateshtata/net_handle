@@ -14,6 +14,8 @@ from crewai.tools.base_tool import BaseTool
 from langchain_community.agent_toolkits.load_tools import load_tools
 from langchain_community.utilities import GoogleSerperAPIWrapper
 
+from experiments.crewai_fleet.nethandle.src.nethandle.test_sneha import model_name
+
 # Healthcare tools
 CodeInterpreterTool_crewtool = CodeInterpreterTool()
 
@@ -30,7 +32,10 @@ health_rag_tool = DOCXSearchTool(docx='/root/net_handle/experiments/crewai_fleet
 lifestyle_rag_tool = DOCXSearchTool(docx='/root/net_handle/experiments/crewai_fleet/nethandle/src/nethandle/user_data/lifestyle_advisor_data.docx')
 
 
-model_name="groq/llama-3.2-90b-vision-preview"
+# model_name="groq/llama-3.1-70b-versatile"
+# model_name="groq/llama-3.2-90b-vision-preview"
+model_name="llama-3.2-3b-preview"
+# model_name="ollama/llama3:70b"
 llm = LLM(model=model_name, api_key="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")
 
 

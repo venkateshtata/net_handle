@@ -7,3 +7,5 @@ scikit-learn
 requests
 openai
 sentence-transformers
+crewai
+ollama

@@ -1,0 +1,30 @@
+
+"How can I adjust my walking routine to better manage my glucose levels?"
+* Healthcare Agent uses internal documents to analyze walking habits, and Lifestyle Agent supplements with exercise tips.
+
+"What meal adjustments should I make to improve my morning glucose levels?"
+* Healthcare Agent evaluates current dietary impact using internal documents; Lifestyle Agent provides internet-researched recommendations.
+
+"Are there specific exercises I can add to help stabilize my blood pressure?"
+* Healthcare Agent relies on internal health data, while Lifestyle Agent suggests exercises from internet research.
+
+"What lifestyle habits could complement my current health goals?"
+* Healthcare Agent identifies gaps in current routines; Lifestyle Agent provides researched lifestyle enhancements.
+
+"Can my sleep patterns affect my glucose levels, and how can I improve them?"
+* Lifestyle Agent offers sleep-related advice, supplementing Healthcare Agent's analysis of health impacts.
+
+"How does my current walking routine align with optimal fitness and health outcomes?"
+* Healthcare Agent evaluates walking effectiveness from documents; Lifestyle Agent suggests improvements.
+
+"What are some stress management techniques to complement my health plan?"
+* Lifestyle Agent provides researched stress management strategies; Healthcare Agent integrates findings.
+
+"What changes in my post-meal routine can help with glucose stabilization?"
+* Healthcare Agent analyzes health metrics; Lifestyle Agent provides activity suggestions based on internet findings.
+
+"What dietary elements should I avoid to maintain stable blood pressure?"
+* Healthcare Agent assesses internal dietary guidelines; Lifestyle Agent supplements with additional advice.
+
+"Are there any online resources or activities I should consider to improve my fitness routine?"
+* Lifestyle Agent provides researched resources; Healthcare Agent verifies their relevance to health data.
