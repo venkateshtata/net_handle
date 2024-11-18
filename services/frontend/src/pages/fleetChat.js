@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { Transition } from '@headlessui/react';
 import ReactMarkdown from 'react-markdown';
 
+
+
 const FleetChat = () => {
   const [messages, setMessages] = useState([{
     sender: "bot", content: "Hey there Bob! How can *we* be of help?"
   }]);
   const [isTyping, setIsTyping] = useState(false);
   const [inputValue, setInputValue] = useState('');
-
+  //"https://f1e4-38-29-145-10.ngrok-free.app/process_query"
   async function postMessage(message) {
     console.log('🚀 Initiating API call with message:', message);
     let data = {
@@ -16,7 +18,7 @@ const FleetChat = () => {
     };
     try {
       console.log('📡 Sending request to API...');
-      const res = await fetch("https://f1e4-38-29-145-10.ngrok-free.app/process_query", {
+      const res = await fetch("http://localhost:8000/process_query", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

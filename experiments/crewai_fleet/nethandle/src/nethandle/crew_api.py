@@ -13,6 +13,21 @@ class QueryResponse(BaseModel):
 # Initialize FastAPI app
 app = FastAPI()
 
+from fastapi.middleware.cors import CORSMiddleware
+
+# Initialize FastAPI app
+app = FastAPI()
+
+# Add CORS Middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # You can specify allowed origins instead of "*"
+    allow_credentials=True,
+    allow_methods=["*"],  # Allow all HTTP methods
+    allow_headers=["*"],  # Allow all headers
+)
+
+
 # Define the input schema for the API
 class QueryRequest(BaseModel):
     topic: str
