@@ -7,10 +7,5 @@ scikit-learn
 requests
 openai
 sentence-transformers
-langchain_community
-langchain_experimental
-langchain_openai
-langgraph
-faiss-gpu
-groq
-twilio
+crewai
+ollama
