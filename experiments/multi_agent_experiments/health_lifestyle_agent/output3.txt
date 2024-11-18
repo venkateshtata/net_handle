@@ -1,0 +1,70 @@
+{'supervisor': {'next': 'LifestyleAgent'}}
+----
+{'LifestyleAgent': {'messages': [HumanMessage(content="I found several diabetes-friendly dinner recipes and confirmed their alignment with your health records and medications. Here's a summary:\n\n### Recipe Suggestions:\n1. **Mediterranean Turkey Skillet**: A flavorful dish combining turkey, vegetables, and Mediterranean spices.\n2. **Salmon Veggie Packets**: Salmon with a variety of vegetables, wrapped in foil and baked.\n3. **Chili-Rubbed Steak with Black Bean Salad**: Lean steak with a spicy rub served alongside a nutritious black bean salad.\n4. **Chicken Butternut Chili**: A hearty chili with lean chicken and butternut squash.\n5. **Lemon-Basil Chicken Rotini**: A light pasta dish with chicken and fresh basil.\n\n### Health Alignment:\nYour health records indicate a focus on meals that maintain optimal glycemic control, support cardiovascular health, and prevent complications. The recipes above are:\n- Low in calories, saturated fat, and sodium.\n- Rich in lean protein, complex carbohydrates, and high in fiber.\n- Include healthy fats, particularly from fish and nuts (like in the salmon recipe).\n- Avoid processed meats and high-glycemic ingredients.\n\n### Recommendations:\n- Consider incorporating non-starchy vegetables like asparagus or kale as sides.\n- Use spices like turmeric, cinnamon, and garlic for additional anti-inflammatory benefits.\n- Practice portion control to manage your weight effectively.\n\nThese recipes should fit well within your dietary plan and help maintain stable blood sugar levels. If you have any specific ingredients to avoid or preferences, let me know!", additional_kwargs={}, response_metadata={}, name='LifestyleAgent')]}}
+----
+{'supervisor': {'next': 'HealthcareAgent'}}
+----
+{'HealthcareAgent': {'messages': [HumanMessage(content='Based on your health records and current medications, I can recommend a diabetes-friendly dinner recipe that aligns with your dietary needs. Here’s a recipe suggestion:\n\n### Recipe: Mediterranean Turkey Skillet\n\n**Ingredients:**\n- 1 pound ground turkey (lean)\n- 1 tablespoon olive oil\n- 1 onion, chopped\n- 2 cloves garlic, minced\n- 1 bell pepper, chopped\n- 1 zucchini, sliced\n- 1 can (14.5 oz) diced tomatoes, no salt added\n- 1 teaspoon dried oregano\n- 1 teaspoon dried basil\n- Salt and pepper to taste\n- 1/4 cup crumbled feta cheese (optional)\n- Fresh parsley for garnish\n\n**Instructions:**\n1. Heat olive oil in a large skillet over medium heat. Add onion and garlic, sauté until translucent.\n2. Add ground turkey and cook until browned.\n3. Stir in bell pepper and zucchini; cook for about 5 minutes.\n4. Add diced tomatoes, oregano, basil, salt, and pepper. Simmer for 10 minutes.\n5. Top with feta cheese and garnish with parsley before serving.\n\n### Health Alignment:\n- **Low Carbohydrate and Glycemic Load:** Helps in maintaining stable blood sugar levels.\n- **Heart-Healthy Ingredients:** Lean turkey and olive oil support cardiovascular health.\n- **High Fiber and Nutrient-Rich Vegetables:** Zucchini and bell peppers provide fiber and essential nutrients.\n- **Sodium Control:** Use of no-salt-added tomatoes and minimal added salt aligns with low-sodium recommendations.\n\nThis recipe is appropriate given your medications and lifestyle recommendations, such as maintaining a low-sodium, heart-healthy diet and ensuring glycemic control. If you need further customization or have specific dietary restrictions, let me know!', additional_kwargs={}, response_metadata={}, name='HealthcareAgent')]}}
+----
+{'supervisor': {'next': 'FINISH'}}
+----
+
+--- Final Summary of Workflow ---
+
+Supervisor decided to assign task to: LifestyleAgent
+LifestyleAgent completed task with response: I found several diabetes-friendly dinner recipes and confirmed their alignment with your health records and medications. Here's a summary:
+
+### Recipe Suggestions:
+1. **Mediterranean Turkey Skillet**: A flavorful dish combining turkey, vegetables, and Mediterranean spices.
+2. **Salmon Veggie Packets**: Salmon with a variety of vegetables, wrapped in foil and baked.
+3. **Chili-Rubbed Steak with Black Bean Salad**: Lean steak with a spicy rub served alongside a nutritious black bean salad.
+4. **Chicken Butternut Chili**: A hearty chili with lean chicken and butternut squash.
+5. **Lemon-Basil Chicken Rotini**: A light pasta dish with chicken and fresh basil.
+
+### Health Alignment:
+Your health records indicate a focus on meals that maintain optimal glycemic control, support cardiovascular health, and prevent complications. The recipes above are:
+- Low in calories, saturated fat, and sodium.
+- Rich in lean protein, complex carbohydrates, and high in fiber.
+- Include healthy fats, particularly from fish and nuts (like in the salmon recipe).
+- Avoid processed meats and high-glycemic ingredients.
+
+### Recommendations:
+- Consider incorporating non-starchy vegetables like asparagus or kale as sides.
+- Use spices like turmeric, cinnamon, and garlic for additional anti-inflammatory benefits.
+- Practice portion control to manage your weight effectively.
+
+These recipes should fit well within your dietary plan and help maintain stable blood sugar levels. If you have any specific ingredients to avoid or preferences, let me know!
+Supervisor decided to assign task to: HealthcareAgent
+HealthcareAgent completed task with response: Based on your health records and current medications, I can recommend a diabetes-friendly dinner recipe that aligns with your dietary needs. Here’s a recipe suggestion:
+
+### Recipe: Mediterranean Turkey Skillet
+
+**Ingredients:**
+- 1 pound ground turkey (lean)
+- 1 tablespoon olive oil
+- 1 onion, chopped
+- 2 cloves garlic, minced
+- 1 bell pepper, chopped
+- 1 zucchini, sliced
+- 1 can (14.5 oz) diced tomatoes, no salt added
+- 1 teaspoon dried oregano
+- 1 teaspoon dried basil
+- Salt and pepper to taste
+- 1/4 cup crumbled feta cheese (optional)
+- Fresh parsley for garnish
+
+**Instructions:**
+1. Heat olive oil in a large skillet over medium heat. Add onion and garlic, sauté until translucent.
+2. Add ground turkey and cook until browned.
+3. Stir in bell pepper and zucchini; cook for about 5 minutes.
+4. Add diced tomatoes, oregano, basil, salt, and pepper. Simmer for 10 minutes.
+5. Top with feta cheese and garnish with parsley before serving.
+
+### Health Alignment:
+- **Low Carbohydrate and Glycemic Load:** Helps in maintaining stable blood sugar levels.
+- **Heart-Healthy Ingredients:** Lean turkey and olive oil support cardiovascular health.
+- **High Fiber and Nutrient-Rich Vegetables:** Zucchini and bell peppers provide fiber and essential nutrients.
+- **Sodium Control:** Use of no-salt-added tomatoes and minimal added salt aligns with low-sodium recommendations.
+
+This recipe is appropriate given your medications and lifestyle recommendations, such as maintaining a low-sodium, heart-healthy diet and ensuring glycemic control. If you need further customization or have specific dietary restrictions, let me know!
+Supervisor decided to assign task to: FINISH
