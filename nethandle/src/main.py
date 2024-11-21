@@ -24,10 +24,10 @@ class AgentResponse(BaseModel):
 # Load the environment and prepare tools
 setup_environment()
 
-health_documents = load_and_prepare_documents("/root/net_handle/nethandle/user_data/health_data")
+health_documents = load_and_prepare_documents("../mock_data/health_data")
 if not health_documents:
     raise Exception("Error: No documents were loaded for health_data.")
-lifestyle_documents = load_and_prepare_documents("/root/net_handle/nethandle/user_data/lifestyle_data")
+lifestyle_documents = load_and_prepare_documents("../mock_data/lifestyle_data")
 if not lifestyle_documents:
     raise Exception("Error: No documents were loaded for lifestyle_data.")
 

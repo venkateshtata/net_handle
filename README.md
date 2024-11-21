@@ -30,8 +30,13 @@ recommendations.
     ```bash
     pip install -r requirements.txt
     ```
-3. Run the main file
+3. Start the workflow API
     ```bash
-    python main.py
+    uvicorn main:app
+    ```
+4. Start the Interface
+    ```bash
+    cd frontend
+    npm start
     ```
 
