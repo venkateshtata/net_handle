@@ -11,11 +11,14 @@
 
 [![Net-Handle Logo](https://i.postimg.cc/QCJxcQyX/logo.png)](#)
 
-**Revolutionizing your digital life by transforming the way you interact with the internet. Making it effortless and intelligent.**
-
-Net handle is an open-source ecosystem that empowers users with personalized insights and suggestions through 
+**Net handle is an open-source ecosystem that empowers users with personalized insights and suggestions through 
 AI-driven agent interactions, allowing you to unify multiple aspects of your life and get tailored 
-recommendations.
+recommendations.**
+
+### Interface Demo
+
+[Watch the demo video](https://www.youtube.com/watch?v=your-video-id)
+
 
 ---
 
