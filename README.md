@@ -17,7 +17,7 @@ recommendations.**
 
 ### Interface Demo
 
-[Watch the demo video](https://www.youtube.com/watch?v=your-video-id)
+[Watch the demo video](https://www.youtube.com/watch?v=your-video-id](https://youtu.be/O16ZLXmX_Sk))
 
 
 ---
